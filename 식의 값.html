@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>식의 값 계산 게임 (입력 포함)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+    .card {
+      display: inline-block;
+      margin: 1rem;
+      padding: 1.5rem 2rem;
+      font-size: 2rem;
+      border: 2px solid #333;
+      border-radius: 1rem;
+      background-color: #f0f0f0;
+      width: 120px;
+    }
+    #expression {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+    }
+    #feedback {
+      margin-top: 1rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+    input {
+      margin-top: 1rem;
+      padding: 0.5rem;
+      font-size: 1.2rem;
+    }
+    button {
+      margin: 1rem;
+      font-size: 1.2rem;
+      padding: 0.5rem 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>식의 값 계산 게임</h1>
+  <div>
+    <div class="card" id="varTerm">문자 항</div>
+    <span style="font-size: 2rem;">+</span>
+    <div class="card" id="constTerm">상수 항</div>
+  </div>
+  <div class="card" id="xValue">x = ?</div>
+
+  <div id="expression">식을 계산해보세요!</div>
+
+  <input type="text" id="userAnswer" placeholder="답을 입력하세요">
+  <br>
+  <button onclick="generateExpression()">항 카드 뽑기</button>
+  <button onclick="revealX()">x 값 뽑기</button>
+  <button onclick="checkAnswer()">정답 확인</button>
+
+  <div id="feedback"></div>
+
+  <script>
+    const varTerms = ["x", "2x", "3x", "4x", "5x", "6x", "7x", "8x", "9x", "-x", "-2x", "-3x", "-4x", "-5x", "-6x", "-7x", "-8x", "-9x"];
+    const constTerms = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9"];
+    const xValues = [1, 2, 3, 4, 5, 6, 7, 8];
+
+    let currentVTerm = "";
+    let currentCTerm = "";
+    let currentX = "?";
+    let currentAnswer = null;
+
+    function generateExpression() {
+      currentVTerm = varTerms[Math.floor(Math.random() * varTerms.length)];
+      currentCTerm = constTerms[Math.floor(Math.random() * constTerms.length)];
+      currentX = "?";
+      currentAnswer = null;
+
+      document.getElementById("varTerm").innerText = currentVTerm;
+      document.getElementById("constTerm").innerText = currentCTerm;
+      document.getElementById("xValue").innerText = "x = ?";
+      const displayCTerm = currentCTerm.startsWith("-") ? `(${currentCTerm})` : currentCTerm;
+      document.getElementById("expression").innerText = `${currentVTerm} + ${displayCTerm} 의 식이 주어졌습니다.`;
+      document.getElementById("feedback").innerText = "";
+      document.getElementById("userAnswer").value = "";
+    }
+
+    function revealX() {
+      currentX = xValues[Math.floor(Math.random() * xValues.length)];
+      document.getElementById("xValue").innerText = `x = ${currentX}`;
+      const coeff = parseFloat(currentVTerm.replace("x", "")) || 1 * (currentVTerm.includes("-") ? -1 : 1);
+      const constant = parseFloat(currentCTerm);
+      currentAnswer = coeff * currentX + constant;
+      const displayCTerm = currentCTerm.startsWith("-") ? `(${currentCTerm})` : currentCTerm;
+      document.getElementById("expression").innerText = `${currentVTerm} + ${displayCTerm} 에 x = ${currentX} 대입하면?`;
+    }
+
+    function checkAnswer() {
+      const userInput = document.getElementById("userAnswer").value;
+      if (currentAnswer === null) {
+        document.getElementById("feedback").innerText = "먼저 x 값을 뽑아야 합니다.";
+        return;
+      }
+      const userValue = parseFloat(userInput);
+      if (isNaN(userValue)) {
+        document.getElementById("feedback").innerText = "숫자를 입력하세요.";
+      } else if (Math.abs(userValue - currentAnswer) < 0.0001) {
+        document.getElementById("feedback").innerText = "정답입니다! ✅";
+      } else {
+        document.getElementById("feedback").innerText = `오답입니다. ❌ 정답은 ${currentAnswer} 입니다.`;
+      }
+    }
+  </script>
+</body>
+</html>
